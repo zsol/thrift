@@ -41,12 +41,15 @@ Library
     Thrift,
     Thrift.Protocol,
     Thrift.Protocol.Binary,
+    Thrift.Protocol.LaxBinary,
     Thrift.Server,
     Thrift.Transport,
     Thrift.Transport.Framed,
     Thrift.Transport.Handle,
     Thrift.Transport.HttpClient,
     Thrift.Types
+  Other-Modules:
+    Thrift.Protocol.Internal
   Extensions:
     DeriveDataTypeable,
     ExistentialQuantification,

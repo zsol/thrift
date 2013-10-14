@@ -25,30 +25,22 @@ module Thrift.Protocol.Binary
     , BinaryProtocol(..)
     ) where
 
-import Control.Exception ( throw )
 import Control.Monad ( liftM )
 
 import qualified Data.Binary
 import Data.Bits
-import Data.Int
 import Data.Text.Lazy.Encoding ( decodeUtf8, encodeUtf8 )
 
 import GHC.Exts
 import GHC.Word
 
 import Thrift.Protocol
+import Thrift.Protocol.Internal
 import Thrift.Transport
 
 import qualified Data.ByteString.Lazy as LBS
 
-version_mask :: Int32
-version_mask = 0xffff0000
-
-version_1 :: Int32
-version_1    = 0x80010000
-
 data BinaryProtocol a = Transport a => BinaryProtocol a
-
 
 instance Protocol BinaryProtocol where
     getTransport (BinaryProtocol t) = t
@@ -84,12 +76,7 @@ instance Protocol BinaryProtocol where
 
     readMessageBegin p = do
         ver <- readI32 p
-        if (ver .&. version_mask /= version_1)
-            then throw $ ProtocolExn PE_BAD_VERSION "Missing version identifier"
-            else do
-              s <- readString p
-              sz <- readI32 p
-              return (s, toEnum $ fromIntegral $ ver .&. 0xFF, sz)
+        verifyAndReadMessageBegin p ver
     readMessageEnd _ = return ()
     readStructBegin _ = return ""
     readStructEnd _ = return ()
